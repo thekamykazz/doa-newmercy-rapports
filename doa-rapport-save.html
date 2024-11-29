@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOA Rapports</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('https://i.pinimg.com/originals/3d/08/e0/3d08e03cb40252526fee2036a67f07f1.gif'); /* URL de l'image de fond */
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+        }
+        .container h2 {
+            margin-bottom: 20px;
+        }
+        .container textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .container input, .container button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .container button:hover {
+            background: #0056b3;
+        }
+        .reports {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .report-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>DOA Rapports</h2>
+        <form id="reportForm">
+            <textarea id="reportContent" placeholder="Résumer de la situation" required></textarea>
+            <input type="text" id="agentID" placeholder="Nom + Prenom + matricule" required>
+            <button type="submit">Envoyer le rapport</button>
+        </form>
+        <div class="reports" id="reportsContainer"></div>
+    </div>
+
+    <script>
+        document.getElementById('reportForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const reportContent = document.getElementById('reportContent').value;
+            const agentID = document.getElementById('agentID').value;
+            const timestamp = new Date().toLocaleString();
+
+            if (reportContent && agentID) {
+                const reportItem = document.createElement('div');
+                reportItem.classList.add('report-item');
+                reportItem.innerHTML = `<strong>Agent ID: ${agentID}</strong><br><strong>Date: ${timestamp}</strong><p>${reportContent}</p>`;
+
+                document.getElementById('reportsContainer').appendChild(reportItem);
+
+                document.getElementById('reportForm').reset();
+
+                // Sauvegarder le rapport dans le stockage local
+                saveReportToLocalStorage(agentID, timestamp, reportContent);
+            } else {
+                alert('Veuillez remplir tous les champs.');
+            }
+        });
+
+        function saveReportToLocalStorage(agentID, timestamp, reportContent) {
+            const reports = JSON.parse(localStorage.getItem('reports')) || [];
+            reports.push({ agentID, timestamp, reportContent });
+            localStorage.setItem('reports', JSON.stringify(reports));
+        }
+
+        function loadReportsFromLocalStorage() {
+            const reports = JSON.parse(localStorage.getItem('reports')) || [];
+            reports.forEach(report => {
+                const reportItem = document.createElement('div');
+                reportItem.classList.add('report-item');
+                reportItem.innerHTML = `<strong>Agent ID: ${report.agentID}</strong><br><strong>Date: ${report.timestamp}</strong><p>${report.reportContent}</p>`;
+                document.getElementById('reportsContainer').appendChild(reportItem);
+            });
+        }
+
+        // Charger les rapports depuis le stockage local au chargement de la page
+        window.onload = loadReportsFromLocalStorage;
+
+        // Fonction pour changer l'image de fond
+        function changeBackground(url) {
+            document.body.style.backgroundImage = `url(${url})`;
+        }
+    </script>
+</body>
+</html>
